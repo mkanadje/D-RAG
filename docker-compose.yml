@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: ./app
+      dockerfile: ./Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - /Users/manish/Developer/projects/llm_rag/rag:/rag
+    env_file:
+      - .env
+  ui:
+    build:
+      context: ./ui
+      dockerfile: ./Dockerfile.ui
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
