@@ -196,5 +196,6 @@ cython_debug/
 
 rag/
 .dockerignore
-.DSStore/
-.DSStore
+.DS_Store/
+.DS_Store
+*/.DS_Store

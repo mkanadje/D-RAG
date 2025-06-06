@@ -79,15 +79,20 @@ def build_rag_pipeline():
     print("Loaded API keys...")
     documents = load_documents()
     print(f"Loaded {len(documents)} documents.")
-    documents = update_metadata(documents)
-    print("Updated metadata for documents")
-    chunks = split_documents(documents)
-    print(f"Split documents into {len(chunks)} chunks.")
-    vector_store = build_vector_store(chunks)
-    print("Built vector store.")
-    conversation_chain = build_conversation_chain(vector_store, os.getenv("MODEL_NAME"))
-    print("Built conversation chain.")
-    return conversation_chain
+    if len(documents) > 0:
+        documents = update_metadata(documents)
+        print("Updated metadata for documents")
+        chunks = split_documents(documents)
+        print(f"Split documents into {len(chunks)} chunks.")
+        vector_store = build_vector_store(chunks)
+        print("Built vector store.")
+        conversation_chain = build_conversation_chain(
+            vector_store, os.getenv("MODEL_NAME")
+        )
+        print("Built conversation chain.")
+        return conversation_chain
+    else:
+        raise Warning("No documents found in the specified folder.")
 
 
 def run():
