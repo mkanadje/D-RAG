@@ -1,10 +1,16 @@
 import streamlit as st
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+backend_host = os.getenv("BACKEND_HOST", "http://localhost")
+backend_port = os.getenv("BACKEND_PORT", "8080")
 
 st.title("RAG Chatbot UI")
 
 if st.button("Build RAG"):
-    response = requests.post("http://localhost:8080/build")
+    response = requests.post(f"{backend_host}:{backend_port}/build")
     if response.status_code == 200:
         st.success("RAG database built successfully.")
     else:
@@ -22,7 +28,9 @@ user_input = st.chat_input("Your question:")
 
 if user_input:
     rag_exists = (
-        requests.get("http://localhost:8080/rag_exists").json().get("exists", False)
+        requests.get(f"{backend_host}:{backend_port}/rag_exists")
+        .json()
+        .get("exists", False)
     )
     if not rag_exists:
         st.error("RAG database not built yet. Please build it first.")
@@ -30,7 +38,7 @@ if user_input:
         st.chat_message("User").markdown(user_input)
         st.session_state.messages.append({"role": "user", "content": user_input})
         response = requests.post(
-            "http://localhost:8080/chat", json={"message": user_input}
+            f"{backend_host}:{backend_port}/chat", json={"message": user_input}
         )
         if response.status_code == 200:
             result = response.json().get("answer", "No answer found.")

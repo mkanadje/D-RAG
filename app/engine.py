@@ -11,7 +11,9 @@ from langchain.chains import ConversationalRetrievalChain
 from IPython.display import Markdown, display
 
 
-def load_documents(folder_path="../rag/data/"):
+def load_documents(folder_path=None):
+    load_dotenv()
+    folder_path = os.getenv("DATA_FOLDER_PATH", folder_path)
     folders = glob.glob(folder_path)
     documents = []
     for folder in folders:
@@ -52,7 +54,9 @@ def load_api_keys():
     os.environ["MODEL_NAME"] = os.getenv("MODEL_NAME")
 
 
-def build_vector_store(chunks, persist_folder="../rag/db/"):
+def build_vector_store(chunks, persist_folder=None):
+    load_dotenv()
+    persist_folder = os.getenv("VECTOR_DB_PATH", persist_folder)
     embeddings = OpenAIEmbeddings()
     if os.path.exists(persist_folder):
         Chroma(
