@@ -32,5 +32,5 @@ async def chat_endpoint(request: ChatRequest):
 @app.post("/build")
 async def build_rag_db():
     global conversation_chain
-    conversation_chain = build_rag_pipeline()
+    conversation_chain = build_rag_pipeline("./rag/data/", "./rag/vector_store/")
     return {"status": "RAG database built successfully."}
