@@ -1,11 +1,10 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from app.engine import build_rag_pipeline
+from app.services.rag_service import RAGService
+import ipdb
 
 app = FastAPI()
-
-
-conversation_chain = None
+rag_service = None
 
 
 class ChatRequest(BaseModel):
@@ -14,23 +13,22 @@ class ChatRequest(BaseModel):
 
 @app.get("/rag_exists")
 async def rag_exists():
-    global conversation_chain
-    if conversation_chain is None:
-        return {"exists": False}
-    return {"exists": True}
+    global rag_service
+    return {"exists": rag_service is not None}
 
 
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
-    global conversation_chain
-    if conversation_chain is None:
-        return {"error": "RAG database not built yet. Please build it first."}
-    response = conversation_chain({"question": request.message})
-    return {"answer": response["answer"]}
+    global rag_service
+    if not rag_service:
+        raise HTTPException(status_code=400, message="RAG is not initialized.")
+    answer = rag_service.query(request.message)
+    return {"answer": answer}
 
 
 @app.post("/build")
 async def build_rag_db():
-    global conversation_chain
-    conversation_chain = build_rag_pipeline()
+    global rag_service
+    rag_service = RAGService()
+    rag_service.build_pipeline()
     return {"status": "RAG database built successfully."}
