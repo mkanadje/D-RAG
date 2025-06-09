@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     VECTOR_DB_PATH: str = os.path.join(ROOT_PATH, "..", "rag", "vector_db")
 
     BACKEND_HOST: str = "http://localhost"
-    BACKEND_PORT: str = "8080"
+    BACKEND_PORT: str = "8501"
     # Model settings
     TEMPERATURE: float = 0.7
 
