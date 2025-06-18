@@ -16,6 +16,18 @@ backend_port = settings.BACKEND_PORT
 
 st.title("RAG Chatbot UI")
 
+uploaded_file = st.file_uploader("Upload PDF files for RAG database", type=["pdf"])
+
+if uploaded_file is not None:
+    st.write(f"Selected file: {uploaded_file.name}")
+    if st.button("Upload"):
+        files = {"file": (uploaded_file.name, uploaded_file, uploaded_file.type)}
+        response = requests.post(f"{backend_host}:{backend_port}/upload", files=files)
+        if response.status_code == 200:
+            st.success("File uploaded successfully.")
+        else:
+            st.error(f"Failed to upload file: {response.text}")
+
 if st.button("Build RAG"):
     response = requests.post(f"{backend_host}:{backend_port}/build")
     if response.status_code == 200:

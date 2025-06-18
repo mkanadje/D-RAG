@@ -1,7 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from app.services.rag_service import RAGService
 import ipdb
+from app.config import get_settings
+import os
+import shutil
 
 app = FastAPI()
 rag_service = None
@@ -32,3 +35,16 @@ async def build_rag_db():
     rag_service = RAGService()
     rag_service.build_pipeline()
     return {"status": "RAG database built successfully."}
+
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    settings = get_settings()
+    if not file.filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PFD files are allowed.")
+    os.makedirs(settings.DATA_FOLDER_PATH, exist_ok=True)
+    print(f"Uploading file: {file.filename} to {settings.DATA_FOLDER_PATH}")
+    file_path = os.path.join(settings.DATA_FOLDER_PATH, file.filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"filename": file.filename, "status": "File uploaded successfully."}
